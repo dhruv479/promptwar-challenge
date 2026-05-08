@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TripPulse — Aurora direction</title>
+  <meta name="description" content="AI itineraries that adapt to weather, crowds, and your mood." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=Fraunces:opsz,wght@9..144,300..700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: { 50: '#FAFAFA', 100: '#F4F4F5', 200: '#E4E4E7', 300: '#D4D4D8', 400: '#A1A1AA', 500: '#71717A', 600: '#52525B', 700: '#3F3F46', 800: '#27272A', 900: '#18181B', 950: '#0A0A0F' },
+            indigo: { 950: '#1E1B4B' },
+            cyan:   { 500: '#06B6D4' },
+            iris:   { 500: '#6366F1' },
+          },
+          fontFamily: {
+            sans:    ['Geist', 'system-ui', 'sans-serif'],
+            mono:    ['Geist Mono', 'ui-monospace', 'monospace'],
+            display: ['Fraunces', 'Geist', 'serif'],
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 0 1px rgba(6,182,212,.18), 0 8px 32px -8px rgba(6,182,212,.35)',
+            'card':      '0 1px 0 rgba(0,0,0,.02), 0 4px 24px -6px rgba(15,15,25,.06)',
+            'card-dark': '0 1px 0 rgba(255,255,255,.04), 0 4px 24px -6px rgba(0,0,0,.6)',
+          },
+          backgroundImage: {
+            'aurora':   'radial-gradient(1200px 600px at 80% -10%, rgba(99,102,241,.18), transparent 60%), radial-gradient(800px 400px at 0% 10%, rgba(6,182,212,.18), transparent 60%)',
+            'aurora-d': 'radial-gradient(1200px 600px at 80% -10%, rgba(99,102,241,.30), transparent 60%), radial-gradient(800px 400px at 0% 10%, rgba(6,182,212,.22), transparent 60%)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root { color-scheme: light dark; }
+    html, body { font-feature-settings: "ss01","cv11","cv02"; }
+    .grain { position: relative; }
+    .grain::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:.035; mix-blend-mode:overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+    .ring-focus:focus-visible { outline: 2px solid #06B6D4; outline-offset: 2px; }
+    .skip:focus { transform: translateY(0); }
+    .dest::before { content:""; position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(10,10,15,.7) 100%); }
+    .chip { display:inline-flex; align-items:center; gap:.4rem; padding:.25rem .6rem; border-radius:9999px; font-size:.72rem; font-weight:500; }
+    .kbd { font: 500 11px/1 'Geist Mono', monospace; padding: 2px 6px; border-radius: 4px; border: 1px solid; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body class="bg-ink-50 dark:bg-ink-950 text-ink-900 dark:text-ink-50 font-sans antialiased selection:bg-cyan-500/30">
+  <a href="#main" class="skip sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-indigo-950 focus:px-3 focus:py-2 focus:text-white">Skip to content</a>
+
+  <!-- ── NAV ─────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-40 backdrop-blur bg-ink-50/70 dark:bg-ink-950/70 border-b border-ink-200/70 dark:border-ink-800/70">
+    <nav aria-label="Primary" class="mx-auto max-w-7xl px-6 h-14 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2 ring-focus rounded">
+        <span class="grid place-items-center h-7 w-7 rounded-md bg-gradient-to-br from-indigo-950 via-iris-500 to-cyan-500 text-white text-sm font-bold">⚡</span>
+        <span class="font-display text-[17px] tracking-tight">TripPulse</span>
+        <span class="chip ml-1 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-500/20">Aurora</span>
+      </a>
+      <ul class="hidden md:flex items-center gap-1 text-sm text-ink-600 dark:text-ink-400">
+        <li><a class="px-3 py-1.5 rounded-md hover:bg-ink-100 dark:hover:bg-ink-800/60 ring-focus" href="#explore">Browse</a></li>
+        <li><a class="px-3 py-1.5 rounded-md hover:bg-ink-100 dark:hover:bg-ink-800/60 ring-focus" href="#how">How it works</a></li>
+        <li><a class="px-3 py-1.5 rounded-md hover:bg-ink-100 dark:hover:bg-ink-800/60 ring-focus" href="#sample">Sample day</a></li>
+        <li><a class="px-3 py-1.5 rounded-md hover:bg-ink-100 dark:hover:bg-ink-800/60 ring-focus" href="#why">Why TripPulse</a></li>
+      </ul>
+      <div class="flex items-center gap-2">
+        <button aria-label="Toggle theme" class="h-8 w-8 grid place-items-center rounded-md border border-ink-200 dark:border-ink-800 hover:bg-ink-100 dark:hover:bg-ink-800/60 ring-focus" onclick="document.documentElement.classList.toggle('dark')">
+          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+        </button>
+        <a class="hidden sm:inline-flex items-center px-3 h-8 rounded-md text-sm border border-ink-200 dark:border-ink-800 hover:bg-ink-100 dark:hover:bg-ink-800/60 ring-focus" href="#">Sign in</a>
+        <a class="inline-flex items-center px-3 h-8 rounded-md text-sm font-medium text-white bg-indigo-950 hover:bg-indigo-950/90 ring-focus" href="#explore">Plan a trip <span aria-hidden="true" class="ml-1">→</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="bg-aurora dark:bg-aurora-d">
+    <!-- ── HERO ─────────────────────────────────────────── -->
+    <section aria-labelledby="hero-title" class="relative grain">
+      <div class="mx-auto max-w-7xl px-6 pt-16 pb-14 lg:pt-24 lg:pb-20">
+        <div class="max-w-3xl">
+          <span class="chip bg-white/70 dark:bg-ink-900/70 ring-1 ring-ink-200 dark:ring-ink-800 text-ink-700 dark:text-ink-300">
+            <span class="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
+            AI-powered itineraries · live as the world moves
+          </span>
+          <h1 id="hero-title" class="mt-5 font-display text-5xl sm:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.02] text-ink-950 dark:text-white">
+            Plans that <span class="italic" style="background:linear-gradient(90deg,#1E1B4B,#6366F1 40%,#06B6D4);-webkit-background-clip:text;background-clip:text;color:transparent">breathe.</span>
+          </h1>
+          <p class="mt-5 text-lg text-ink-600 dark:text-ink-300 max-w-2xl">
+            Tell TripPulse who you are and how you travel. We craft a minute-by-minute itinerary
+            that adapts to weather, crowds, prices and your mood — so the plan moves with you.
+          </p>
+
+          <!-- Search -->
+          <form class="mt-8 grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr_auto] gap-2 p-2 rounded-2xl bg-white/80 dark:bg-ink-900/80 ring-1 ring-ink-200 dark:ring-ink-800 shadow-card dark:shadow-card-dark backdrop-blur" role="search" aria-label="Plan a trip">
+            <label class="group flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-ink-100/70 dark:hover:bg-ink-800/40 ring-focus">
+              <svg class="h-4 w-4 text-ink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s8-7.3 8-13a8 8 0 0 0-16 0c0 5.7 8 13 8 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              <span class="flex flex-col text-left">
+                <span class="text-[11px] uppercase tracking-wider text-ink-500">Where</span>
+                <input class="bg-transparent outline-none text-sm w-full placeholder:text-ink-400" placeholder="Bali, Kyoto, Iceland…" />
+              </span>
+            </label>
+            <label class="group flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-ink-100/70 dark:hover:bg-ink-800/40 ring-focus">
+              <svg class="h-4 w-4 text-ink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+              <span class="flex flex-col text-left">
+                <span class="text-[11px] uppercase tracking-wider text-ink-500">When</span>
+                <input class="bg-transparent outline-none text-sm w-full placeholder:text-ink-400" placeholder="Apr 12 → Apr 19" />
+              </span>
+            </label>
+            <label class="group flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-ink-100/70 dark:hover:bg-ink-800/40 ring-focus">
+              <svg class="h-4 w-4 text-ink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+              <span class="flex flex-col text-left">
+                <span class="text-[11px] uppercase tracking-wider text-ink-500">Style</span>
+                <select class="bg-transparent outline-none text-sm w-full">
+                  <option>Balanced explorer</option><option>Foodie focus</option><option>Outdoor adventurer</option><option>Slow & cultural</option>
+                </select>
+              </span>
+            </label>
+            <button class="inline-flex items-center justify-center gap-2 px-4 rounded-xl bg-indigo-950 text-white text-sm font-medium hover:bg-indigo-950/90 shadow-glow-cyan ring-focus">
+              Generate <span aria-hidden="true">→</span>
+            </button>
+          </form>
+
+          <!-- Trust strip -->
+          <dl class="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-2xl">
+            <div><dt class="text-[11px] uppercase tracking-wider text-ink-500">Destinations</dt><dd class="font-display text-2xl">92</dd></div>
+            <div><dt class="text-[11px] uppercase tracking-wider text-ink-500">Trips planned</dt><dd class="font-display text-2xl">1.2k</dd></div>
+            <div><dt class="text-[11px] uppercase tracking-wider text-ink-500">Avg. p95 gen</dt><dd class="font-display text-2xl">3.4s</dd></div>
+            <div><dt class="text-[11px] uppercase tracking-wider text-ink-500">Accessibility</dt><dd class="font-display text-2xl">AA</dd></div>
+          </dl>
+        </div>
+
+        <!-- Floating "why this?" demo card -->
+        <aside class="hidden lg:block absolute right-6 top-24 w-[320px] rounded-2xl bg-white/85 dark:bg-ink-900/85 ring-1 ring-ink-200 dark:ring-ink-800 backdrop-blur p-4 shadow-card dark:shadow-card-dark" aria-label="Why this suggestion">
+          <div class="flex items-center justify-between">
+            <span class="chip bg-iris-500/10 text-iris-500 ring-1 ring-iris-500/20">Why this?</span>
+            <span class="font-mono text-[11px] text-ink-500">DAY 3 · 09:00</span>
+          </div>
+          <p class="mt-3 font-display text-lg leading-snug">Tegallalang Rice Terraces</p>
+          <ul class="mt-3 text-sm text-ink-600 dark:text-ink-300 space-y-1.5">
+            <li class="flex items-start gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-cyan-500"></span> Matches "outdoor" + "photography" in your DNA</li>
+            <li class="flex items-start gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-cyan-500"></span> Forecast: clear, 26°C — ideal window</li>
+            <li class="flex items-start gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-cyan-500"></span> 12 min from your stay; quiet at this hour</li>
+          </ul>
+          <div class="mt-3 flex items-center gap-1.5 text-[11px] text-ink-500">
+            <span class="kbd border-ink-300 dark:border-ink-700">?</span> open · <span class="kbd border-ink-300 dark:border-ink-700">⌘K</span> swap
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ── EXPLORE ──────────────────────────────────────── -->
+    <section id="explore" class="border-t border-ink-200/70 dark:border-ink-800/70 bg-ink-50 dark:bg-ink-950">
+      <div class="mx-auto max-w-7xl px-6 py-16 lg:py-20">
+        <div class="flex items-end justify-between flex-wrap gap-4">
+          <div>
+            <span class="chip bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-500/20">Top experiences</span>
+            <h2 class="mt-3 font-display text-4xl sm:text-5xl tracking-tight">Inspire before you search.</h2>
+            <p class="mt-2 text-ink-600 dark:text-ink-400 max-w-xl">Curated destinations, each with a one-tap entry to a fully personalised plan.</p>
+          </div>
+          <ul role="tablist" aria-label="Filter destinations" class="flex flex-wrap gap-1.5 text-sm">
+            <li><button role="tab" aria-selected="true" class="chip bg-indigo-950 text-white">All</button></li>
+            <li><button role="tab" class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 text-ink-700 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800/60">Asia</button></li>
+            <li><button role="tab" class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 text-ink-700 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800/60">Europe</button></li>
+            <li><button role="tab" class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 text-ink-700 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800/60">Americas</button></li>
+            <li><button role="tab" class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 text-ink-700 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800/60">Africa</button></li>
+            <li><button role="tab" class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 text-ink-700 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800/60">Oceania</button></li>
+          </ul>
+        </div>
+
+        <ul class="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Bali -->
+          <li>
+            <a href="#" class="dest group relative block overflow-hidden rounded-2xl ring-1 ring-ink-200 dark:ring-ink-800 ring-focus aspect-[4/5]" style="background:radial-gradient(120% 80% at 20% 20%, #34D399 0%, #047857 50%, #064E3B 100%)">
+              <div class="absolute inset-0 grid place-items-center opacity-90 mix-blend-screen" aria-hidden="true">
+                <svg viewBox="0 0 200 200" class="w-3/4 opacity-70"><g fill="none" stroke="rgba(255,255,255,.45)" stroke-width=".5"><path d="M0 140 Q50 110 100 140 T200 140"/><path d="M0 150 Q50 120 100 150 T200 150"/><path d="M0 160 Q50 130 100 160 T200 160"/><path d="M0 170 Q50 140 100 170 T200 170"/></g></svg>
+              </div>
+              <div class="absolute left-4 top-4 flex gap-1.5">
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Asia</span>
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Apr–Oct</span>
+              </div>
+              <div class="absolute inset-x-0 bottom-0 p-4 text-white">
+                <h3 class="font-display text-2xl tracking-tight">Bali</h3>
+                <p class="text-sm/5 text-white/85 mt-0.5">Rice terraces, temples & surf culture</p>
+                <div class="mt-3 flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
+                  <span>$$ · 7-day plan</span><span class="opacity-90">Plan →</span>
+                </div>
+              </div>
+            </a>
+          </li>
+          <!-- Kyoto -->
+          <li>
+            <a href="#" class="dest group relative block overflow-hidden rounded-2xl ring-1 ring-ink-200 dark:ring-ink-800 ring-focus aspect-[4/5]" style="background:radial-gradient(120% 80% at 80% 20%, #FB7185 0%, #BE123C 55%, #4C0519 100%)">
+              <div class="absolute inset-0 grid place-items-center opacity-80" aria-hidden="true">
+                <svg viewBox="0 0 200 200" class="w-3/4"><g fill="rgba(255,255,255,.18)"><circle cx="100" cy="100" r="40"/><circle cx="100" cy="100" r="60" fill="none" stroke="rgba(255,255,255,.18)"/><circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,.10)"/></g></svg>
+              </div>
+              <div class="absolute left-4 top-4 flex gap-1.5">
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Asia</span>
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Mar–May</span>
+              </div>
+              <div class="absolute inset-x-0 bottom-0 p-4 text-white">
+                <h3 class="font-display text-2xl tracking-tight">Kyoto</h3>
+                <p class="text-sm/5 text-white/85 mt-0.5">Shrines, ryokans & cherry blossoms</p>
+                <div class="mt-3 flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
+                  <span>$$$ · 6-day plan</span><span>Plan →</span>
+                </div>
+              </div>
+            </a>
+          </li>
+          <!-- Iceland -->
+          <li>
+            <a href="#" class="dest group relative block overflow-hidden rounded-2xl ring-1 ring-ink-200 dark:ring-ink-800 ring-focus aspect-[4/5]" style="background:linear-gradient(160deg, #0EA5E9 0%, #1E40AF 50%, #1E1B4B 100%)">
+              <div class="absolute inset-0" aria-hidden="true">
+                <svg viewBox="0 0 200 200" class="w-full h-full"><g fill="none" stroke="rgba(165,243,252,.5)" stroke-width="1"><path d="M-10 60 Q 60 20 120 70 T 220 60"/><path d="M-10 80 Q 60 40 120 90 T 220 80" stroke="rgba(125,211,252,.45)"/><path d="M-10 100 Q 60 60 120 110 T 220 100" stroke="rgba(186,230,253,.4)"/></g></svg>
+              </div>
+              <div class="absolute left-4 top-4 flex gap-1.5">
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Europe</span>
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Sep–Mar</span>
+              </div>
+              <div class="absolute inset-x-0 bottom-0 p-4 text-white">
+                <h3 class="font-display text-2xl tracking-tight">Iceland</h3>
+                <p class="text-sm/5 text-white/85 mt-0.5">Aurora, glaciers & geothermal lagoons</p>
+                <div class="mt-3 flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
+                  <span>$$$$ · 8-day plan</span><span>Plan →</span>
+                </div>
+              </div>
+            </a>
+          </li>
+          <!-- Patagonia -->
+          <li>
+            <a href="#" class="dest group relative block overflow-hidden rounded-2xl ring-1 ring-ink-200 dark:ring-ink-800 ring-focus aspect-[4/5]" style="background:linear-gradient(180deg, #94A3B8 0%, #475569 45%, #0F172A 100%)">
+              <div class="absolute bottom-0 inset-x-0" aria-hidden="true">
+                <svg viewBox="0 0 200 80" class="w-full"><polygon points="0,80 30,30 50,50 80,15 110,45 140,20 170,50 200,30 200,80" fill="rgba(255,255,255,.16)"/><polygon points="0,80 40,55 70,65 100,40 130,60 160,45 200,55 200,80" fill="rgba(255,255,255,.10)"/></svg>
+              </div>
+              <div class="absolute left-4 top-4 flex gap-1.5">
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Americas</span>
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Nov–Mar</span>
+              </div>
+              <div class="absolute inset-x-0 bottom-0 p-4 text-white">
+                <h3 class="font-display text-2xl tracking-tight">Patagonia</h3>
+                <p class="text-sm/5 text-white/85 mt-0.5">Granite spires, glaciers & gauchos</p>
+                <div class="mt-3 flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
+                  <span>$$$ · 10-day plan</span><span>Plan →</span>
+                </div>
+              </div>
+            </a>
+          </li>
+          <!-- Marrakech -->
+          <li>
+            <a href="#" class="dest group relative block overflow-hidden rounded-2xl ring-1 ring-ink-200 dark:ring-ink-800 ring-focus aspect-[4/5]" style="background:radial-gradient(120% 80% at 30% 30%, #FCD34D 0%, #EA580C 50%, #7C2D12 100%)">
+              <div class="absolute inset-0 grid place-items-center" aria-hidden="true">
+                <svg viewBox="0 0 200 200" class="w-3/4 opacity-80"><g fill="none" stroke="rgba(255,255,255,.35)"><polygon points="100,40 140,90 100,140 60,90"/><polygon points="100,60 130,90 100,120 70,90"/><polygon points="100,80 120,90 100,100 80,90"/></g></svg>
+              </div>
+              <div class="absolute left-4 top-4 flex gap-1.5">
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Africa</span>
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Mar–May</span>
+              </div>
+              <div class="absolute inset-x-0 bottom-0 p-4 text-white">
+                <h3 class="font-display text-2xl tracking-tight">Marrakech</h3>
+                <p class="text-sm/5 text-white/85 mt-0.5">Souks, riads & desert dunes</p>
+                <div class="mt-3 flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
+                  <span>$$ · 5-day plan</span><span>Plan →</span>
+                </div>
+              </div>
+            </a>
+          </li>
+          <!-- Santorini -->
+          <li>
+            <a href="#" class="dest group relative block overflow-hidden rounded-2xl ring-1 ring-ink-200 dark:ring-ink-800 ring-focus aspect-[4/5]" style="background:linear-gradient(180deg, #BAE6FD 0%, #3B82F6 55%, #1E3A8A 100%)">
+              <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 grid place-items-center" aria-hidden="true">
+                <svg viewBox="0 0 200 80" class="w-3/4"><g fill="rgba(255,255,255,.85)"><rect x="20" y="40" width="30" height="35"/><rect x="55" y="30" width="40" height="45" rx="2"/><circle cx="75" cy="20" r="14"/><rect x="100" y="35" width="25" height="40"/><rect x="130" y="25" width="40" height="50" rx="2"/><circle cx="150" cy="15" r="12"/></g></svg>
+              </div>
+              <div class="absolute left-4 top-4 flex gap-1.5">
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Europe</span>
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">May–Oct</span>
+              </div>
+              <div class="absolute inset-x-0 bottom-0 p-4 text-white">
+                <h3 class="font-display text-2xl tracking-tight">Santorini</h3>
+                <p class="text-sm/5 text-white/85 mt-0.5">Caldera sunsets & volcanic vintages</p>
+                <div class="mt-3 flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
+                  <span>$$$ · 5-day plan</span><span>Plan →</span>
+                </div>
+              </div>
+            </a>
+          </li>
+          <!-- Tokyo -->
+          <li>
+            <a href="#" class="dest group relative block overflow-hidden rounded-2xl ring-1 ring-ink-200 dark:ring-ink-800 ring-focus aspect-[4/5]" style="background:radial-gradient(120% 80% at 70% 30%, #F472B6 0%, #DC2626 45%, #1F2937 100%)">
+              <div class="absolute inset-0" aria-hidden="true">
+                <svg viewBox="0 0 200 200" class="w-full h-full"><g fill="none" stroke="rgba(253,224,71,.35)"><path d="M0 120h200M0 140h200M0 160h200"/><circle cx="40" cy="60" r="6" fill="rgba(253,224,71,.5)" stroke="none"/><circle cx="160" cy="50" r="4" fill="rgba(248,113,113,.6)" stroke="none"/></g></svg>
+              </div>
+              <div class="absolute left-4 top-4 flex gap-1.5">
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Asia</span>
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Mar–May</span>
+              </div>
+              <div class="absolute inset-x-0 bottom-0 p-4 text-white">
+                <h3 class="font-display text-2xl tracking-tight">Tokyo</h3>
+                <p class="text-sm/5 text-white/85 mt-0.5">Neon, izakaya & bullet-train day-trips</p>
+                <div class="mt-3 flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
+                  <span>$$$ · 7-day plan</span><span>Plan →</span>
+                </div>
+              </div>
+            </a>
+          </li>
+          <!-- Cape Town -->
+          <li>
+            <a href="#" class="dest group relative block overflow-hidden rounded-2xl ring-1 ring-ink-200 dark:ring-ink-800 ring-focus aspect-[4/5]" style="background:linear-gradient(160deg, #22D3EE 0%, #0891B2 45%, #134E4A 100%)">
+              <div class="absolute bottom-0 inset-x-0" aria-hidden="true">
+                <svg viewBox="0 0 200 80" class="w-full"><polygon points="0,80 0,55 40,30 80,45 120,25 160,40 200,20 200,80" fill="rgba(255,255,255,.18)"/></svg>
+              </div>
+              <div class="absolute left-4 top-4 flex gap-1.5">
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Africa</span>
+                <span class="chip bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">Nov–Mar</span>
+              </div>
+              <div class="absolute inset-x-0 bottom-0 p-4 text-white">
+                <h3 class="font-display text-2xl tracking-tight">Cape Town</h3>
+                <p class="text-sm/5 text-white/85 mt-0.5">Table Mountain, vineyards & two oceans</p>
+                <div class="mt-3 flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
+                  <span>$$ · 7-day plan</span><span>Plan →</span>
+                </div>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── HOW IT WORKS ─────────────────────────────────── -->
+    <section id="how" class="border-t border-ink-200/70 dark:border-ink-800/70">
+      <div class="mx-auto max-w-7xl px-6 py-16 lg:py-20">
+        <div class="max-w-2xl">
+          <span class="chip bg-iris-500/10 text-iris-500 ring-1 ring-iris-500/20">How it works</span>
+          <h2 class="mt-3 font-display text-4xl sm:text-5xl tracking-tight">Three steps. One living plan.</h2>
+        </div>
+        <ol class="mt-10 grid md:grid-cols-3 gap-4">
+          <li class="rounded-2xl bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 p-6 shadow-card dark:shadow-card-dark">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs text-ink-500">01</span>
+              <span class="grid place-items-center h-9 w-9 rounded-md bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-500/20">🧬</span>
+            </div>
+            <h3 class="mt-4 font-display text-xl">Tell us your DNA</h3>
+            <p class="mt-2 text-sm text-ink-600 dark:text-ink-400">Optional 2-minute quiz, or jump straight to filters. Either way, we read between the lines.</p>
+          </li>
+          <li class="rounded-2xl bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 p-6 shadow-card dark:shadow-card-dark">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs text-ink-500">02</span>
+              <span class="grid place-items-center h-9 w-9 rounded-md bg-iris-500/10 text-iris-500 ring-1 ring-iris-500/20">🧠</span>
+            </div>
+            <h3 class="mt-4 font-display text-xl">We craft the plan</h3>
+            <p class="mt-2 text-sm text-ink-600 dark:text-ink-400">A minute-by-minute itinerary respecting opening hours, transit, intensity balance and your budget.</p>
+          </li>
+          <li class="rounded-2xl bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 p-6 shadow-card dark:shadow-card-dark">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs text-ink-500">03</span>
+              <span class="grid place-items-center h-9 w-9 rounded-md bg-indigo-950/10 dark:bg-indigo-950/40 text-indigo-950 dark:text-iris-500 ring-1 ring-indigo-950/20">⚡</span>
+            </div>
+            <h3 class="mt-4 font-display text-xl">It adapts in real time</h3>
+            <p class="mt-2 text-sm text-ink-600 dark:text-ink-400">Forecast turns rainy? We re-shuffle. Prices drop? You get an alert. The plan moves with you.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ── SAMPLE DAY ───────────────────────────────────── -->
+    <section id="sample" class="border-t border-ink-200/70 dark:border-ink-800/70 bg-ink-100/40 dark:bg-ink-900/40">
+      <div class="mx-auto max-w-7xl px-6 py-16 lg:py-20">
+        <div class="flex items-end justify-between flex-wrap gap-4">
+          <div>
+            <span class="chip bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-500/20">Sample · Bali · Day 3</span>
+            <h2 class="mt-3 font-display text-4xl sm:text-5xl tracking-tight">A day in the timeline.</h2>
+            <p class="mt-2 text-ink-600 dark:text-ink-400 max-w-xl">Drag to reorder. Swap with a tap. Every card explains itself.</p>
+          </div>
+          <div class="hidden md:flex items-center gap-2 text-sm">
+            <span class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800">Forecast: ☀ 26°C · clear</span>
+            <span class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800">Day 3 / 7</span>
+          </div>
+        </div>
+
+        <ol class="mt-10 relative grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-y-3 gap-x-8">
+          <!-- 09:00 -->
+          <li class="lg:contents">
+            <div class="hidden lg:flex items-start pt-4">
+              <span class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 font-mono">09:00 · Morning</span>
+            </div>
+            <article class="rounded-2xl bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 shadow-card dark:shadow-card-dark p-5">
+              <div class="flex items-start gap-4">
+                <span class="grid place-items-center h-10 w-10 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/20">🥾</span>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between gap-3">
+                    <h3 class="font-display text-lg">Tegallalang Rice Terraces</h3>
+                    <span class="chip bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-500/20">Why this?</span>
+                  </div>
+                  <p class="text-sm text-ink-600 dark:text-ink-400 mt-1">Beat the crowds at golden hour. Light hike, photo-rich.</p>
+                  <dl class="mt-3 grid grid-cols-3 gap-3 text-[12px] font-mono text-ink-600 dark:text-ink-400">
+                    <div><dt class="text-ink-500">Duration</dt><dd>~2h</dd></div>
+                    <div><dt class="text-ink-500">Intensity</dt><dd class="flex items-center gap-1">Med <span class="inline-flex gap-0.5"><i class="h-1.5 w-3 rounded-sm bg-cyan-500"></i><i class="h-1.5 w-3 rounded-sm bg-cyan-500"></i><i class="h-1.5 w-3 rounded-sm bg-ink-200 dark:bg-ink-800"></i></span></dd></div>
+                    <div><dt class="text-ink-500">From last</dt><dd>12 min</dd></div>
+                  </dl>
+                </div>
+              </div>
+            </article>
+          </li>
+          <!-- 11:30 -->
+          <li class="lg:contents">
+            <div class="hidden lg:flex items-start pt-4"><span class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 font-mono">11:30 · Late morning</span></div>
+            <article class="rounded-2xl bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 shadow-card dark:shadow-card-dark p-5">
+              <div class="flex items-start gap-4">
+                <span class="grid place-items-center h-10 w-10 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/20">☕</span>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between gap-3">
+                    <h3 class="font-display text-lg">Suka Espresso, Ubud</h3>
+                    <span class="chip bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/20">Local gem</span>
+                  </div>
+                  <p class="text-sm text-ink-600 dark:text-ink-400 mt-1">Avocado-on-toast that's actually good. Vegan options.</p>
+                  <dl class="mt-3 grid grid-cols-3 gap-3 text-[12px] font-mono text-ink-600 dark:text-ink-400">
+                    <div><dt class="text-ink-500">Duration</dt><dd>~1h</dd></div>
+                    <div><dt class="text-ink-500">Intensity</dt><dd>Low</dd></div>
+                    <div><dt class="text-ink-500">From last</dt><dd>9 min</dd></div>
+                  </dl>
+                </div>
+              </div>
+            </article>
+          </li>
+          <!-- 13:00 -->
+          <li class="lg:contents">
+            <div class="hidden lg:flex items-start pt-4"><span class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 font-mono">13:00 · Afternoon</span></div>
+            <article class="rounded-2xl bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 shadow-card dark:shadow-card-dark p-5">
+              <div class="flex items-start gap-4">
+                <span class="grid place-items-center h-10 w-10 rounded-lg bg-violet-500/10 text-violet-700 dark:text-violet-300 ring-1 ring-violet-500/20">🏛</span>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between gap-3">
+                    <h3 class="font-display text-lg">Saraswati Temple</h3>
+                    <span class="chip bg-amber-500/10 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/20">Cooler hour</span>
+                  </div>
+                  <p class="text-sm text-ink-600 dark:text-ink-400 mt-1">Lotus pond entrance. Small donation customary; sarong provided.</p>
+                  <dl class="mt-3 grid grid-cols-3 gap-3 text-[12px] font-mono text-ink-600 dark:text-ink-400">
+                    <div><dt class="text-ink-500">Duration</dt><dd>~45m</dd></div>
+                    <div><dt class="text-ink-500">Intensity</dt><dd>Low</dd></div>
+                    <div><dt class="text-ink-500">From last</dt><dd>6 min</dd></div>
+                  </dl>
+                </div>
+              </div>
+            </article>
+          </li>
+          <!-- 17:30 -->
+          <li class="lg:contents">
+            <div class="hidden lg:flex items-start pt-4"><span class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 font-mono">17:30 · Evening</span></div>
+            <article class="rounded-2xl bg-gradient-to-br from-indigo-950 to-iris-500 text-white p-5 shadow-glow-cyan">
+              <div class="flex items-start gap-4">
+                <span class="grid place-items-center h-10 w-10 rounded-lg bg-white/15 ring-1 ring-white/20">🍽</span>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between gap-3">
+                    <h3 class="font-display text-lg">Locavore NXT</h3>
+                    <span class="chip bg-white/15 ring-1 ring-white/25">Reservation locked</span>
+                  </div>
+                  <p class="text-sm text-white/85 mt-1">Tasting menu, Indonesian heritage. We held your 18:00 slot.</p>
+                  <dl class="mt-3 grid grid-cols-3 gap-3 text-[12px] font-mono text-white/85">
+                    <div><dt class="text-white/60">Duration</dt><dd>~2h</dd></div>
+                    <div><dt class="text-white/60">Intensity</dt><dd>Low</dd></div>
+                    <div><dt class="text-white/60">From last</dt><dd>14 min</dd></div>
+                  </dl>
+                </div>
+              </div>
+            </article>
+          </li>
+          <!-- 21:00 -->
+          <li class="lg:contents">
+            <div class="hidden lg:flex items-start pt-4"><span class="chip bg-white dark:bg-ink-900 ring-1 ring-ink-200 dark:ring-ink-800 font-mono">21:00 · Night</span></div>
+            <article class="rounded-2xl bg-white dark:bg-ink-900 ring-1 ring-dashed ring-ink-300 dark:ring-ink-700 p-5">
+              <div class="flex items-start gap-4">
+                <span class="grid place-items-center h-10 w-10 rounded-lg bg-ink-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 ring-1 ring-ink-200 dark:ring-ink-700">＋</span>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between gap-3">
+                    <h3 class="font-display text-lg text-ink-700 dark:text-ink-300">Fill this slot?</h3>
+                    <span class="chip bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-500/20">3 suggestions</span>
+                  </div>
+                  <p class="text-sm text-ink-600 dark:text-ink-400 mt-1">Open suggestion drawer · Press <span class="kbd border-ink-300 dark:border-ink-700">⌘K</span></p>
+                </div>
+              </div>
+            </article>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ── WHY ─────────────────────────────────────────── -->
+    <section id="why" class="border-t border-ink-200/70 dark:border-ink-800/70">
+      <div class="mx-auto max-w-7xl px-6 py-16 lg:py-20">
+        <div class="max-w-2xl">
+          <span class="chip bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-500/20">Why TripPulse</span>
+          <h2 class="mt-3 font-display text-4xl sm:text-5xl tracking-tight">A planner that earns your trust.</h2>
+        </div>
+        <div class="mt-10 overflow-hidden rounded-2xl ring-1 ring-ink-200 dark:ring-ink-800">
+          <table class="w-full text-sm">
+            <thead class="bg-ink-100/70 dark:bg-ink-900/70 text-left">
+              <tr>
+                <th class="px-5 py-3 font-medium text-ink-600 dark:text-ink-300">Capability</th>
+                <th class="px-5 py-3 font-medium text-ink-600 dark:text-ink-300">Typical planner</th>
+                <th class="px-5 py-3 font-medium">TripPulse</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-ink-200 dark:divide-ink-800 bg-white dark:bg-ink-900">
+              <tr><td class="px-5 py-3">Itinerary generation</td><td class="px-5 py-3 text-ink-500">Manual / template</td><td class="px-5 py-3">AI-personalised, with reasoning</td></tr>
+              <tr><td class="px-5 py-3">Weather handling</td><td class="px-5 py-3 text-ink-500">Generic tips</td><td class="px-5 py-3">Forecast-driven, time-slot specific</td></tr>
+              <tr><td class="px-5 py-3">Activity detail</td><td class="px-5 py-3 text-ink-500">Name + location</td><td class="px-5 py-3">Icon · time-of-day · duration · intensity</td></tr>
+              <tr><td class="px-5 py-3">Adaptability</td><td class="px-5 py-3 text-ink-500">Static</td><td class="px-5 py-3">Versioned, with diffs</td></tr>
+              <tr><td class="px-5 py-3">Accessibility</td><td class="px-5 py-3 text-ink-500">Patchy</td><td class="px-5 py-3">WCAG 2.2 AA · keyboard-first</td></tr>
+              <tr><td class="px-5 py-3">Price honesty</td><td class="px-5 py-3 text-ink-500">Point estimate</td><td class="px-5 py-3">Confidence intervals (P50–P90)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ──────────────────────────────────────── -->
+    <footer class="border-t border-ink-200/70 dark:border-ink-800/70">
+      <div class="mx-auto max-w-7xl px-6 py-10 flex flex-wrap items-center justify-between gap-4 text-sm text-ink-600 dark:text-ink-400">
+        <div class="flex items-center gap-2">
+          <span class="grid place-items-center h-6 w-6 rounded bg-gradient-to-br from-indigo-950 via-iris-500 to-cyan-500 text-white text-[11px] font-bold">⚡</span>
+          <span class="font-display">TripPulse</span>
+          <span class="font-mono text-xs text-ink-500">v0.1 · Aurora mockup</span>
+        </div>
+        <ul class="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <li><a class="hover:text-ink-900 dark:hover:text-white ring-focus" href="#">Privacy</a></li>
+          <li><a class="hover:text-ink-900 dark:hover:text-white ring-focus" href="#">Accessibility</a></li>
+          <li><a class="hover:text-ink-900 dark:hover:text-white ring-focus" href="#">Status</a></li>
+          <li><a class="hover:text-ink-900 dark:hover:text-white ring-focus" href="#">Changelog</a></li>
+        </ul>
+      </div>
+    </footer>
+  </main>
+</body>
+</html>

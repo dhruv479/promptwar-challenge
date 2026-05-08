@@ -1,0 +1,66 @@
+[
+  {
+    "id": "tokyo-jp",
+    "name": "Tokyo",
+    "country": "Japan",
+    "description": "Japan's busy capital, mixes the ultramodern and the traditional, from neon-lit skyscrapers to historic temples.",
+    "imageUrl": "https://picsum.photos/seed/tokyo-neon-temples/900/1100",
+    "tags": ["culture", "food", "technology", "shopping"]
+  },
+  {
+    "id": "paris-fr",
+    "name": "Paris",
+    "country": "France",
+    "description": "France's capital, is a major European city and a global center for art, fashion, gastronomy and culture.",
+    "imageUrl": "https://picsum.photos/seed/paris-eiffel-sunset/900/1100",
+    "tags": ["art", "romance", "food", "history"]
+  },
+  {
+    "id": "bali-id",
+    "name": "Bali",
+    "country": "Indonesia",
+    "description": "An Indonesian island known for its forested volcanic mountains, iconic rice paddies, beaches and coral reefs.",
+    "imageUrl": "https://picsum.photos/seed/bali-rice-terrace/900/1100",
+    "tags": ["beach", "nature", "relaxation", "culture"]
+  },
+  {
+    "id": "new-york-us",
+    "name": "New York City",
+    "country": "USA",
+    "description": "A global hub of culture, entertainment, and business, famous for its skyline and fast-paced lifestyle.",
+    "imageUrl": "https://picsum.photos/seed/nyc-skyline-lights/900/1100",
+    "tags": ["city", "entertainment", "shopping", "food"]
+  },
+  {
+    "id": "rome-it",
+    "name": "Rome",
+    "country": "Italy",
+    "description": "Italy's capital, a sprawling, cosmopolitan city with nearly 3,000 years of globally influential art, architecture and culture on display.",
+    "imageUrl": "https://picsum.photos/seed/rome-colosseum-day/900/1100",
+    "tags": ["history", "food", "art", "architecture"]
+  },
+  {
+    "id": "london-uk",
+    "name": "London",
+    "country": "UK",
+    "description": "The capital of England and the United Kingdom, is a 21st-century city with history stretching back to Roman times.",
+    "imageUrl": "https://picsum.photos/seed/london-tower-bridge/900/1100",
+    "tags": ["history", "culture", "sightseeing", "theater"]
+  },
+  {
+    "id": "kyoto-jp",
+    "name": "Kyoto",
+    "country": "Japan",
+    "description": "Once the capital of Japan, famous for its numerous classical Buddhist temples, gardens, imperial palaces, and traditional wooden houses.",
+    "imageUrl": "https://picsum.photos/seed/kyoto-fushimi-shrine/900/1100",
+    "tags": ["culture", "temples", "nature", "peaceful"]
+  },
+  {
+    "id": "dubai-ae",
+    "name": "Dubai",
+    "country": "UAE",
+    "description": "A city and emirate in the United Arab Emirates known for luxury shopping, ultramodern architecture and a lively nightlife scene.",
+    "imageUrl": "https://picsum.photos/seed/dubai-luxury-skyline/900/1100",
+    "tags": ["luxury", "shopping", "architecture", "desert"]
+  }
+]

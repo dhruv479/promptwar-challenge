@@ -1,0 +1,72 @@
+[
+  {
+    "id": "place-tokyo-skytree",
+    "destinationId": "tokyo-jp",
+    "name": "Tokyo Skytree",
+    "type": "landmark",
+    "description": "A broadcasting and observation tower with panoramic city views.",
+    "tags": ["sightseeing", "views", "indoor", "high-budget"],
+    "baseDurationMinutes": 120,
+    "intensity": "low"
+  },
+  {
+    "id": "place-meiji-jingu",
+    "destinationId": "tokyo-jp",
+    "name": "Meiji Jingu",
+    "type": "culture",
+    "description": "A Shinto shrine dedicated to the deified spirits of Emperor Meiji and his wife.",
+    "tags": ["culture", "outdoor", "free", "walking"],
+    "baseDurationMinutes": 90,
+    "intensity": "med"
+  },
+  {
+    "id": "place-louvre",
+    "destinationId": "paris-fr",
+    "name": "Louvre Museum",
+    "type": "museum",
+    "description": "The world's largest art museum and a historic monument in Paris.",
+    "tags": ["art", "history", "indoor", "walking"],
+    "baseDurationMinutes": 240,
+    "intensity": "med"
+  },
+  {
+    "id": "place-eiffel",
+    "destinationId": "paris-fr",
+    "name": "Eiffel Tower",
+    "type": "landmark",
+    "description": "Wrought-iron lattice tower on the Champ de Mars.",
+    "tags": ["landmark", "views", "outdoor", "iconic"],
+    "baseDurationMinutes": 150,
+    "intensity": "low"
+  },
+  {
+    "id": "place-ulun-danu",
+    "destinationId": "bali-id",
+    "name": "Ulun Danu Beratan Temple",
+    "type": "culture",
+    "description": "A picturesque water temple on the shores of Lake Beratan.",
+    "tags": ["culture", "outdoor", "views"],
+    "baseDurationMinutes": 90,
+    "intensity": "low"
+  },
+  {
+    "id": "place-monkey-forest",
+    "destinationId": "bali-id",
+    "name": "Sacred Monkey Forest Sanctuary",
+    "type": "nature",
+    "description": "A natural habitat for Balinese long-tailed monkeys in Ubud.",
+    "tags": ["nature", "outdoor", "walking", "animals"],
+    "baseDurationMinutes": 120,
+    "intensity": "med"
+  },
+  {
+    "id": "place-tegalalang",
+    "destinationId": "bali-id",
+    "name": "Tegalalang Rice Terrace",
+    "type": "landmark",
+    "description": "Beautifully terraced rice fields offering stunning scenic views.",
+    "tags": ["landmark", "nature", "outdoor", "views", "walking"],
+    "baseDurationMinutes": 150,
+    "intensity": "high"
+  }
+]
